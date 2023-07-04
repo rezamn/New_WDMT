@@ -1,2 +1,2 @@
 # New_WDMT
-Wavelet Domain Moment tensor inversion
+Wavelet Domain Moment Tensor Inversion
