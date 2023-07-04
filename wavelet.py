@@ -17,7 +17,7 @@ def phi(omega):
     return np.sqrt(g(omega) * g(-omega))
 
 
-def sy(omega):
+def psy(omega):
     return np.exp(-1j * omega / 2) * np.sqrt(phi(omega / 2) * phi(omega / 2) - phi(omega) * phi(omega))
 
 
@@ -32,8 +32,8 @@ def wavelet_transform_j(input_signal, n, sampling_frequency, j):
     k_max = 2 ** j
     ajk = []
     for si in np.arange(k_max):
-        ajk.append(aas[si] * np.conj(sy(2 * np.pi * si / k_max)) + aas[si + 2 ** j] * np.conj(
-            sy(2 * np.pi + 2 * np.pi * si / k_max)))
+        ajk.append(aas[si] * np.conj(psy(2 * np.pi * si / k_max)) + aas[si + 2 ** j] * np.conj(
+            psy(2 * np.pi + 2 * np.pi * si / k_max)))
     alpha = 2 * np.real(np.fft.ifft(np.array(ajk), norm='forward')) * np.sqrt(nn / sampling_frequency / k_max)
     return np.array(alpha)
 
@@ -45,8 +45,8 @@ def wavelet_transform(input_signal, n, sampling_frequency):
     # aas = np.fft.fft(input_signal, nn, norm='forward')  # norm='forward' means scaled with 1/NN
     for j in np.arange(n):
         alpha.append(wavelet_transform_j(input_signal, nn, sampling_frequency, j))
-        # k_max = 2 ** j ajk = [] for si in np.arange(k_max): ajk.append(aas[si] * np.conj(sy(2 * np.pi * si /
-        # k_max)) + aas[si + 2 ** j] * np.conj( sy(2 * np.pi + 2 * np.pi * si / k_max))) alpha.append(2 * np.real(
+        # k_max = 2 ** j ajk = [] for si in np.arange(k_max): ajk.append(aas[si] * np.conj(psy(2 * np.pi * si /
+        # k_max)) + aas[si + 2 ** j] * np.conj( psy(2 * np.pi + 2 * np.pi * si / k_max))) alpha.append(2 * np.real(
         # np.fft.ifft(np.array(ajk), norm='forward')) * np.sqrt(nn / sampling_frequency / k_max))
     return np.array(alpha, dtype=object)
 
@@ -62,7 +62,7 @@ def inverse_wavelet_transform_j(alpha, n, sampling_frequency, j):
     for k in np.arange(2 ** j):
         a = (2 ** j) * sampling_frequency / nn
         b = k
-        sw = sw + np.sqrt(a) * alpha[k] * (1 / a) * (np.exp(-1j * omega * b / a) * sy(omega / a))
+        sw = sw + np.sqrt(a) * alpha[k] * (1 / a) * (np.exp(-1j * omega * b / a) * psy(omega / a))
 
     return np.real(np.fft.ifft(np.fft.ifftshift(sw), norm='backward')) * sampling_frequency
 
@@ -78,7 +78,7 @@ def inverse_wavelet_transform(alpha, sampling_frequency):
         # for k in np.arange(2 ** j):
         #     a = (2 ** j) * sampling_frequency / n
         #     b = k
-        #     sw += np.sqrt(a) * alpha[j][k] * (1 / a) * (np.exp(-1j * omega * b / a) * sy(omega / a))
+        #     sw += np.sqrt(a) * alpha[j][k] * (1 / a) * (np.exp(-1j * omega * b / a) * psy(omega / a))
 
     return signal
 
@@ -95,7 +95,7 @@ def inverse_wavelet_transform_2(alpha, sampling_frequency, j_min=0, j_max=0):
         for k in np.arange(2 ** j):
             a = (2 ** j) * sampling_frequency / n
             b = k
-            sw += np.sqrt(a) * alpha[j][k] * (1 / a) * (np.exp(-1j * omega * b / a) * sy(omega / a))
+            sw += np.sqrt(a) * alpha[j][k] * (1 / a) * (np.exp(-1j * omega * b / a) * psy(omega / a))
 
     return np.real(np.fft.ifft(np.fft.ifftshift(sw), norm='backward')) * sampling_frequency
 
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     f = np.arange(-N / 2, N / 2) * df
     w = 2 * np.pi * f
 
-    s = sy(w)
+    s = psy(w)
 
     fig = plt.figure(figsize=(5, 6))
 
