@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib
+matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
 import os
 
@@ -99,6 +101,31 @@ def inverse_wavelet_transform_2(alpha, sampling_frequency, j_min=0, j_max=0):
 
     return np.real(np.fft.ifft(np.fft.ifftshift(sw), norm='backward')) * sampling_frequency
 
+def frequency_band(input_signal, sampling_frequency):
+    n = len(input_signal)
+    n = next_pow2(n)
+    nn = 2 ** n
+    T = nn / sampling_frequency
+    max_j = int(np.log2(nn))
+    fig , axs = plt.subplots( 1, figsize=(6, 4))
+    for i in range(max_j):
+        axs.semilogx([2 ** i / 3 / T, 2 ** i * 4 / 3 / T],[.05*(i % 3 + 1) , .05*( i % 3 + 1)])
+        axs.text(((2 ** i / 3 / T) + (2 ** i * 4 / 3 / T))/2 , .05*( i % 3 + 1)+.02,
+                 "j = %d\nf = [%.2f %.2f]" % (i, 2 ** i / 3 / T, 2 ** i * 4 / 3 / T),
+                 horizontalalignment='center',verticalalignment='center',fontsize = 6)
+    axs.spines['right'].set_visible(False)
+    axs.spines['left'].set_visible(False)
+    axs.spines['top'].set_visible(False)
+    axs.spines['bottom'].set_visible(True)
+    axs.tick_params(axis='both', which='both', bottom=True, top=False, right=False, left=False,
+                                   labelsize=6)
+    axs.set_yticks([])
+    axs.set_xlabel("Frequency (Hz)")
+    axs.set_ylim(0, .5)
+    fig.savefig("./output/frequency_band.eps")
+
+
+
 
 if __name__ == '__main__':
     if not os.path.exists("output"):
@@ -153,7 +180,7 @@ if __name__ == '__main__':
     plt.ylabel(r"Amplitude", loc="top", rotation=0)
     plt.text(-4.5, 1.25, "(b)")
     plt.tight_layout()
-    plt.savefig(".\\output\\fig1.eps")
+    plt.savefig("./output/fig1.eps")
     plt.show()
 
     N = 1024
@@ -174,7 +201,7 @@ if __name__ == '__main__':
     # plt.show()
     # print(np.sum(xt ** 2 - xi ** 2) / np.sum(xi ** 2))
 
-    max_j = np.uint(np.log2(N))
+    max_j = int(np.log2(N))
     fig, axs = plt.subplots(max_j + 1, 1, sharex='col', sharey='row', figsize=(6, 8))
 
     for i in np.arange(max_j):
@@ -223,5 +250,7 @@ if __name__ == '__main__':
 
 
     plt.tight_layout()
-    plt.savefig(".\\output\\fig2.eps")
+    plt.savefig("./output/fig2.eps")
     plt.show()
+
+    frequency_band(xi, 100)
